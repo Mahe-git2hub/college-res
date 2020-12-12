@@ -1,0 +1,63 @@
+/* Mutex is a shortened form of the words "mutual exclusion".
+Mutex variables are one of the primary means of implementing thread synchronization.
+A mutex variable acts like a "lock" protecting access to a shared data resource. The basic
+concept of a mutex as used in Pthreads is that only one thread can lock (or own) a mutex
+variable at any given time. Thus, even if several threads try to lock a mutex only one
+thread will be successful. No other thread can own that mutex until the owning thread
+unlocks that mutex. Threads must "take turns" accessing protected data.
+Very often the action performed by a thread owning a mutex is the updating of global
+variables. This is a safe way to ensure that when several threads update the same
+variable, the final value is the same as what it would be if only one thread performed the
+update. The variables being updated belong to a "critical section".
+
+*/
+
+
+// counter with mutex
+
+#include <pthread.h>
+#include<stdlib.h>
+#include<stdio.h>
+#include<unistd.h>
+#define n 5
+int counter; /* incremented by threads */
+
+pthread_mutex_t lock;
+
+void *fnt(void *);
+	
+int main(int argc, char **argv) {
+	pthread_t tidA, tidB;
+        pthread_mutex_init(&lock, NULL);
+         /*int pthread_mutex_init(pthread_mutex_t *restrict mutex,
+           const pthread_mutexattr_t *restrict attr);*/
+
+
+	pthread_create(&tidA, NULL, &fnt, NULL);
+	pthread_create(&tidB, NULL, &fnt, NULL);
+
+	pthread_join(tidA, NULL);
+	pthread_join(tidB, NULL);
+	exit(0);
+}
+
+void * fnt(void *vptr) {
+	int i, val;
+
+	/* Each thread fetches, prints, and increments the counter "n"
+	times. The value of the counter should increase monotonically. 		*/
+	
+	for (i = 0; i < n; i++) {
+		pthread_mutex_lock(&lock);
+/*
+The pthread_mutex_lock( ) routine is used by a thread to acquire a lock on the specified mutex variable. If the mutex is already locked by another thread, the call will block the calling thread until the mutex is unlocked. 
+*/
+
+		val = counter;
+		printf("Thread id %ld: counter value %d\n", pthread_self(), val);
+		counter = val + 1;
+		pthread_mutex_unlock(&lock);
+	}
+	
+	return (NULL);
+}

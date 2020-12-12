@@ -1,0 +1,135 @@
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+typedef long double ld;
+typedef pair<int,int > pii;
+typedef pair<int,pii > piii;
+typedef vector<int>     VI;
+
+#define sc1(x) scanf("%d",&x);
+#define sc2(x,y) scanf("%d%d",&x,&y);
+#define sc3(x,y,z) scanf("%d%d%d",&x,&y,&z);
+/*
+#define sc1(x) scanf("%lld",&x);
+#define sc2(x,y) scanf("%lld%lld",&x,&y);
+#define sc3(x,y,z) scanf("%lld%lld%lld",&x,&y,&z);
+*/
+#define pb push_back
+#define mp make_pair
+#define ini(x,val) memset(x,val,sizeof(x));
+#define fs first
+#define sc second
+#define MOD 1000000007
+#define inf 1000000001
+#define linf 99999999999999999ll	//long long inf
+#define PI 3.1415926535897932384626
+const double eps=0.000000000000001 ;
+
+#define tr(container, it)  for(typeof(container.begin()) it = container.begin(); it != container.end(); it++) 
+#define PrintCont(cont) {cout<<("\n----------------\n");\
+for(typeof(cont.begin()) it = cont.begin();it!=cont.end();++it) cout<<*it<<" ";cout<<("\n----------------\n");}
+#define all(v) v.begin(),v.end()
+string convertstring(ll n) { stringstream ss; ss << n ; return ss.str(); }
+
+#define debug(x) cerr<<#x<<" :: "<<x<<"\n";
+#define debug2(x,y) cerr<<#x<<" :: "<<x<<"\t"<<#y<<" :: "<<y<<"\n";
+#define debug3(x,y,z) cerr<<#x<<" :: "<<x<<"\t"<<#y<<" :: "<<y<<"\t"<<#z<<" :: "<<z<<"\n";
+#define debug4(x,y,z,a) cerr<<#x<<" :: "<<x<<"\t"<<#y<<" :: "<<y<<"\t"<<#z<<" :: "<<z<<"\t"<<#a<<" :: "<<a<<"\n";
+#define debugarr(a,st,en) {cerr<<"\n"<<#a<<" :: ";for(int i=st;i<=en;++i)cerr<<a[i]<<" ";cerr<<"\n";}
+
+#define LIM 100005
+struct node
+{
+	int vertex,last;bool flag ;	// flag = 0 ->next edge should be smaller
+	bool operator < (const node a) const{
+		return this->last < a.last;
+	}
+};
+#define poo pair<int,pair<int,bool > > 
+std::vector<pii> g[2][LIM];
+int main()
+{	
+	int t;
+	sc1(t);
+	while(t--)
+	{
+		int n,m,i;
+		sc2(n,m);
+		for(i=1;i<=n+1;++i)
+			g[0][i].clear() , g[1][i].clear();
+		for(i=0;i<m;++i)
+		{
+			int u,v,w;
+			sc3(u,v,w);
+			g[0][u].pb(mp(w,v));g[0][v].pb(mp(w,u));
+			g[1][u].pb(mp(w,v));g[1][v].pb(mp(w,u));
+		}
+		for(i=1;i<=n;++i)
+		{
+			sort(all(g[0][i]),greater<pii >() );	// desc
+			sort(all(g[1][i]));	//asc
+		}
+		int src,dest;
+		sc2(src,dest);
+		priority_queue<pair<ll,poo >  , vector<pair<ll,poo > > ,greater < pair<ll , poo > > > pq;
+		pq.push({0,{src,{0,1}}}) ;
+		map<poo ,ll > vis ;
+		ll ans = -1;
+		while(!pq.empty())
+		{
+			pair<ll,poo >  top = pq.top();
+			pq.pop();
+			int vertex = top.sc.fs ,last = top.sc.sc.fs ;
+			ll dis = top.fs ; bool flag = top.sc.sc.sc ;
+			
+			//debug4(dis,vertex,last,flag);
+			if(dis > vis[top.sc])continue;
+			if(vertex == dest)
+			{
+				ans = dis ;
+				break ;
+			}
+			/*if(vertex == 4)
+			{
+				printf("\n------------\n");
+				for(int i=0;i<g[flag][vertex].size();++i)
+				{
+					printf("%d %d\n",g[flag][vertex][i].fs , g[flag][vertex][i].sc);
+				}
+				printf("\n-------\n");
+			}*/
+			for(i=g[flag][vertex].size()-1;i>=0;--i)
+			{
+				int v = g[flag][vertex][i].sc  , w = g[flag][vertex][i].fs ;
+
+				if(flag == 0 && w >= last) break ;
+				if(flag == 1 && w <= last) break ;
+				
+				g[flag][vertex].pop_back();
+				poo nw = (poo){v , {w , flag^1} };
+/*
+				if(vertex ==4)
+				{
+					tr(vis,it)
+					{
+						debug4(it->sc , it->fs . vertex , it->fs . last , it->fs.flag);
+					}
+					debug((vis.find(nw) == vis.end()));
+					
+				}*/
+				if(vis.find(nw) == vis.end() || (dis + w < vis[nw]))
+				{
+
+					pq.push(mp(dis + w,nw));
+					vis[nw] = dis + w ;
+				//	debug4(v,(flag^1),w,dis+w);
+				}
+			}
+			
+		}
+		if(ans == -1)
+			printf("No Solution\n");
+		else printf("%lld\n",ans);
+	}
+	return 0;
+}

@@ -1,0 +1,104 @@
+module big(input1,s0,s1,s2,a0,a1,a2,loc,aluop,class,contunit);
+input [31:0] input1;
+output [15:0] loc;
+output [15:0] aluop;
+input [4:0] s0;
+input [4:0] s1;
+input [4:0] s2;
+output [4:0] contunit;
+output [2:0] class;
+output [4:0] a0;
+output [4:0] a1;
+output [4:0] a2;
+reg [2:0] class;
+reg [4:0] contunit;
+reg [4:0] a0;
+reg [4:0] a1;
+reg [4:0] a2;
+reg [15:0] loc;
+reg [15:0] aluop;
+
+always @(input1,class)
+begin
+case(input1[31:26])
+ 32'b000000 : class=3'b001;
+ 32'b100011 : class=3'b010;
+ 32'b101011 : class=3'b010;
+ 32'b000100 : class=3'b010;
+ 32'b000010 : class=3'b100;
+endcase
+if(input1[31:26]==32'b000000)
+   begin
+   a0=s1+s2;
+   a1=s1;
+  loc=16'd0;
+  aluop=16'd30;
+a2=s2;
+   contunit=5'b10010;
+
+   end
+if(input1[31:26]==32'b100011)
+   begin
+
+   contunit=5'b11000;
+ aluop=16'd42;
+ loc=16'd0;
+   end
+if(input1[31:26]==32'b101011)
+   begin
+   contunit=5'b00100;
+ aluop=16'd42;
+ loc=16'd40;
+   end
+if(input1[31:26]==32'b000100)
+   begin
+   contunit=5'b00001;
+ loc=16'd0;
+ aluop=16'd96;
+
+   end
+if(input1[31:26]==32'b000010)
+   begin
+   contunit=5'b00000;
+ loc=16'd0;
+ aluop=16'd0;
+   end
+end
+endmodule
+
+module bigt_b;
+reg [31:0] input1;
+wire [15:0] loc;
+wire [15:0] aluop;
+reg [4:0] s0;
+reg [4:0] s1;
+reg [4:0] s2;
+wire [4:0] contunit;
+wire [2:0] class;
+wire [4:0] a0;
+wire [4:0] a1;
+wire [4:0] a2;
+big mybig(input1,s0,s1,s2,a0,a1,a2,loc,aluop,class,contunit);
+initial
+begin
+$monitor("input=%b class=%b s0=%d s1=%d s2=%d contunit %b loc=%d aluop =%ds",input1,class,a0,a1,a2,contunit,loc,aluop);
+s0=5'd4;
+s1=5'd10;
+s2=5'd20;
+input1=32'b00000001010101000010000000100000;
+#1
+input1=32'b10001101010001000000000000101010;
+#1
+input1=32'b10101101010001000000000000101010;
+#1
+input1=32'b00010000100010100000000011001000;
+#1
+input1=32'b00001000000000000000010000000000;
+
+end
+endmodule
+
+
+
+
+/* change the bits in the switch cases*/

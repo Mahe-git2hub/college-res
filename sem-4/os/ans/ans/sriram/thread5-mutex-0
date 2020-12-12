@@ -1,0 +1,40 @@
+#include<stdio.h>
+#include<string.h>
+#include<pthread.h>
+#include<stdlib.h>
+#include<unistd.h>
+
+//counter without mutex 
+
+pthread_t tid[2];
+int counter;
+
+void* fnt(void *arg)
+{
+    unsigned long i = 0;
+    counter += 1;
+    printf("Thread id %ld: counter value %d started\n", pthread_self(), counter);
+    for(i=0; i<1000000000;i++);
+    printf("Thread id %ld: counter value %d finished\n", pthread_self(), counter);
+
+    return NULL;
+}
+
+int main()
+{
+    int i = 0;
+    int r;
+
+    while(i < 2)
+    {
+        r = pthread_create(&(tid[i]), NULL, &fnt, NULL);
+        if (r != 0)
+            printf("Can't create thread :[%s]\n", strerror(r));
+        i++;
+    }
+
+    pthread_join(tid[0], NULL);
+    pthread_join(tid[1], NULL);
+
+    return 0;
+}

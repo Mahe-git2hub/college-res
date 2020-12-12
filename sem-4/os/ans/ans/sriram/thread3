@@ -1,0 +1,37 @@
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+long s = 0;
+
+//thread to generate sum of 0 to N
+
+void* sum(void* arg)
+{
+ long val = (long) arg;
+ 
+ for(long i = 0; i <= val; i++)
+  {
+   s += i;
+  }
+
+  pthread_exit(NULL);
+}
+
+int main()
+{
+long i, n = 10;
+
+pthread_t tids[3];
+
+//create thread
+
+for(i = 0; i < 3; i++)
+{
+pthread_create(&tids[i], NULL, sum, (void*)n);
+pthread_join(tids[i], NULL);
+}
+
+printf("Sum of first %ld numbers computed %ld times is %ld\n", n, i, s);
+}

@@ -1,0 +1,136 @@
+#include<bits/stdc++.h>
+using namespace std;
+#define pb(x) push_back(x)
+typedef long long int ll;
+typedef long double ld;
+ll inf=pow(10,17);
+ll mod=1e9+7;
+vector<pair<ll,pair<ll,ll> > > arr;
+
+ll rank1[200005],parent[200005];
+ll findRoot(ll curr)
+{
+    if(curr==parent[curr])
+        return curr;
+    return parent[curr]=findRoot(parent[curr]);
+}
+
+bool union1(ll a,ll b)
+{
+
+    ll root1=findRoot(a);
+    ll root2=findRoot(b);
+    if(root1==root2)
+        return false;
+
+    if(rank1[root1]<rank1[root2])
+    parent[root1]=root2;
+    else if(rank1[root1]>rank1[root2])
+    parent[root2]=root1;
+    else
+    {
+        parent[root2]=root1;
+        rank1[root1]++;
+    }
+    return true;
+
+}
+ll n;
+ll sub[200005];
+ll val[200005];
+vector<ll> adj[200005];
+void dfs(ll curr,ll par)
+{
+    sub[curr]=1;
+    val[curr]=0;
+    vector<ll> child;
+    for(ll x:adj[curr])
+    {
+        if(x!=par)
+        {
+            dfs(x,curr);
+            sub[curr]+=sub[x];
+            child.push_back(sub[x]);
+        }
+    }
+    ll sum1=0;
+    if(child.size()==0)
+        return;
+
+    sum1=child[0];
+    ll value=0;
+    for(ll i=1;i<child.size();i++)
+    {
+        value+=child[i]*sum1;
+        sum1+=child[i];
+    }
+
+    value+=(n-sum1-1)*sum1;
+
+
+    val[curr]=value;
+
+}
+bool comp(pair<ll,ll>& a,pair<ll,ll> &b)
+{
+    if(a.first<b.first)
+        return false;
+    else if(a.first>b.first)
+        return true;
+    else
+        return a.second<b.second;
+}
+
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+
+    ll m;
+
+    cin>>n>>m;
+    for(ll i=1;i<=n;i++)
+        parent[i]=i,rank1[i]=1;
+    for(ll i=0;i<m;i++)
+    {
+        ll x,y,c;
+        cin>>x>>y>>c;
+        arr.push_back({c,{x,y}});
+    }
+    sort(arr.begin(),arr.end());
+    ll edge=0;
+    for(pair<ll,pair<ll,ll> > x:arr)
+    {
+        ll a=x.second.first;
+        ll b=x.second.second;
+        bool val=union1(a,b);
+        if(!val)
+            continue;
+        adj[a].push_back(b);
+        adj[b].push_back(a);
+        edge++;
+        if(edge==n-1)
+            break;
+    }
+
+    dfs(1,-1);
+    pair<ll,ll> arr2[200005];
+    for(ll i=1;i<=n;i++)
+        arr2[i].first=val[i],arr2[i].second=i;
+
+    sort(arr2+1,arr2+n+1,comp);
+
+
+
+
+    for(ll i=1;i<=n;i++)
+        cout<<arr2[i].second<<endl;
+
+
+
+
+    return 0;
+
+}
