@@ -59,3 +59,4 @@ dkms.conf
 
 #folders
 .idea
+.ipynb_checkpoints
