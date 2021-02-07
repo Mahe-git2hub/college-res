@@ -60,3 +60,9 @@ dkms.conf
 #folders
 .idea
 .ipynb_checkpoints
+/sem-6/compiler design lab/.classpath
+/sem-6/compiler design lab/.project
+.out
+/sem-7/fods/class videos/
+
+/sem-7/fods/mam folder/
